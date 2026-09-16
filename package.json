@@ -2,8 +2,28 @@
   "name": "partvault",
   "version": "1.0.0",
   "private": true,
-  "description": "PartVault · 电子元件收纳管理系统（微型数据库 + 实物货架可视化）",
+  "description": "微收纳仓库 · 电子元件收纳管理系统：微型数据库 + 3D 实物货架可视化（零依赖 Node + 内置 SQLite）",
   "main": "server.js",
+  "license": "MIT",
+  "author": "lvoliverrrr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvoliverrrr/micro-stash.git"
+  },
+  "homepage": "https://github.com/lvoliverrrr/micro-stash#readme",
+  "bugs": {
+    "url": "https://github.com/lvoliverrrr/micro-stash/issues"
+  },
+  "keywords": [
+    "inventory",
+    "inventory-management",
+    "electronics",
+    "components",
+    "sqlite",
+    "zero-dependency",
+    "self-hosted",
+    "vanilla-js"
+  ],
   "scripts": {
     "start": "node --no-warnings server.js --open",
     "serve": "node --no-warnings server.js"

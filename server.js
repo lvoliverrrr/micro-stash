@@ -20,7 +20,61 @@ const http = require('node:http');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { DatabaseSync } = require('node:sqlite');
+
+/* ---- 版本自检：node:sqlite 从 Node 22.5 起内置 ----
+ * 注意版本细节（容易踩坑）：
+ *   v22.5.0  引入 node:sqlite，但**必须**加 --experimental-sqlite
+ *   v22.13.0 / v23.4.0  起不再需要该 flag
+ * 所以 22.5~22.12 的用户会直接报「找不到模块」。这里自动补上 flag 重启自己，
+ * 让「双击 start.bat / 跑 start.sh / 直接 node server.js」三条路径都能直接跑通。 */
+let DatabaseSync;
+try {
+  ({ DatabaseSync } = require('node:sqlite'));
+} catch (e) {
+  const v = process.versions.node;
+  const p = String(v).split('.');
+  const maj = Number(p[0]);
+  const min = Number(p[1]);
+  const supportsFlag = !Number.isNaN(maj) && (maj > 22 || (maj === 22 && min >= 5));
+  const triedFlag = process.execArgv.includes('--experimental-sqlite');
+
+  /* 22.5~22.12：模块在，只是被 flag 挡着 → 加上 flag 重新拉起自己 */
+  if (supportsFlag && !triedFlag) {
+    const { spawnSync } = require('node:child_process');
+    console.log('  检测到 Node v' + v + '：node:sqlite 需要 --experimental-sqlite，正在自动重启…');
+    const r = spawnSync(
+      process.execPath,
+      ['--experimental-sqlite'].concat(process.execArgv, [__filename], process.argv.slice(2)),
+      { stdio: 'inherit', env: process.env }
+    );
+    process.exit(r.status === null || r.status === undefined ? 1 : r.status);
+  }
+
+  const line = '  ' + '='.repeat(58);
+  console.error('');
+  console.error(line);
+  console.error('    PartVault · 启动失败');
+  console.error(line);
+  console.error('    当前 Node.js : v' + v);
+  console.error('    需要的版本   : 22.5 或更高（推荐 22.13+ / 20.x 之外的 LTS）');
+  console.error('');
+  if (!supportsFlag) {
+    console.error('    原因：本项目用 Node 内置的 node:sqlite 存数据，');
+    console.error('          这个模块从 Node 22.5 才开始提供。');
+    console.error('');
+    console.error('    怎么修：到 https://nodejs.org/ 下载 LTS 版，');
+    console.error('            覆盖安装即可，不用先卸载旧版。');
+  } else {
+    console.error('    原因：版本够新，但加载 node:sqlite 仍然失败。');
+    console.error('          多半是装了多个 Node，或安装不完整。');
+    console.error('          详细信息：' + e.message);
+  }
+  console.error('');
+  console.error('    查当前版本：node -v');
+  console.error(line);
+  console.error('');
+  process.exit(1);
+}
 
 /* ============================== 配置 ============================== */
 

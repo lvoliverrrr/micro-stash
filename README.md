@@ -3,7 +3,7 @@
 把你真实的元件柜搬进屏幕：**列 → 抽屉 → 格子 → 元件**。每次取出、放入都自动记一笔账。
 面向个人电子爱好者的轻量库存管理 —— 一个微型数据库 + 高度可视化的操作界面。
 
-> 零依赖：不需要 `npm install`，只要 Node.js ≥ 22.5。
+> 零依赖：不需要 `npm install`，只要有 Node.js。
 > 后端 `node:http` + `node:sqlite`（Node 内置），前端原生 JS，无框架、无构建步骤。
 
 ![柜体总览](preview/1_柜体总览.png)
@@ -22,8 +22,20 @@
 
 ## 快速开始
 
+### 环境要求
+
+| 项 | 说明 |
+|---|---|
+| Node.js | **22.5 或更高**（必需，`node:sqlite` 从这个版本开始内置） |
+| 推荐版本 | **22.13+ / 23.4+ / 24+**（这些版本不再需要 `--experimental-sqlite`） |
+| npm | 不需要，项目零依赖 |
+| 数据库 | 不需要单独安装，就是一个 `.db` 文件 |
+
+> 如果你正好在 **22.5 ~ 22.12** 之间：这几个版本里 `node:sqlite` 藏在 `--experimental-sqlite` 后面。
+> 程序会自己检测并带上该参数重启一次，**你不用手动做任何事**。想彻底避开就升到 22.13+。
+
 ```bash
-# 1. 确认 Node 版本（需要 ≥ 22.5，内置 node:sqlite）
+# 1. 确认 Node 版本
 node -v
 
 # 2. 启动（零依赖，无需 install）
@@ -105,8 +117,9 @@ preview/               成品截图
 | GET | `/api/search?q=` | 全局搜索（元件名/规格/封装/编号/位置） |
 | GET | `/api/moves` | 流水列表 |
 | GET | `/api/drawers/:id` | 单个抽屉的全部格子 |
-| POST | `/api/cells/op` | **单格操作**：`IN` / `OUT` / `SET` / `CLEAR` / `SWAP` / `MOVE` |
-| POST | `/api/cells/batch` | 批量格子操作 |
+| POST | `/api/cells/op` | **单格操作**，见下方说明 |
+| POST | `/api/cells/:id` | 同上，只是把 `cell_id` 放进 URL |
+| POST | `/api/cells/batch` | 批量格子操作（body：`{ ops: [...] }`） |
 | GET / POST | `/api/categories` | 分类列表 / 新建 |
 | PUT / DELETE | `/api/categories/:id` | 改 / 删分类 |
 | GET / POST | `/api/parts` | 元件列表 / 新建 |
@@ -116,6 +129,35 @@ preview/               成品截图
 | GET / POST | `/api/export` `/api/import` | 备份导出 / 导入（`mode: merge \| replace`） |
 | POST | `/api/reset` | 清空库存与流水（保留元件库） |
 | POST | `/api/factory-reset` | 出厂重置 |
+
+### `POST /api/cells/op` 单格操作
+
+body 里用 **`op`** 字段（不是 `kind`）指定动作：
+
+| `op` | 作用 | 需要带的字段 |
+|---|---|---|
+| `ASSIGN` | 给空格子指定元件种类并放入若干（**首次上架用这个**） | `cell_id` `part_id` `qty` |
+| `IN` | 往已有元件的格子里补货 | `cell_id` `qty` |
+| `OUT` | 取出（自动封顶，不会取成负数） | `cell_id` `qty` |
+| `SET` | 直接把库存改成某个数 | `cell_id` `qty` |
+| `CLEAR` | 清空格子（元件不再占用该格） | `cell_id` |
+| `MOVE` | 把整格挪到另一个格子（目标格必须为空或同种元件） | `cell_id` `target_cell_id` |
+
+可选字段：`note`（备注）、`ts`（自定义时间）。
+
+```bash
+# 首次上架：1 号格放 25 个 1 号元件
+curl -X POST http://127.0.0.1:7788/api/cells/op \
+  -H 'Content-Type: application/json' \
+  -d '{"op":"ASSIGN","cell_id":1,"part_id":1,"qty":25,"note":"新手上架"}'
+
+# 取出 10 个
+curl -X POST http://127.0.0.1:7788/api/cells/op \
+  -H 'Content-Type: application/json' \
+  -d '{"op":"OUT","cell_id":1,"qty":10}'
+```
+
+返回 `{"ok":true,"cell_id":1,"part_id":1,"before":25,"after":15}`。
 
 ## 快捷键
 
