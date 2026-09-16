@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+<title>PartVault · 电子元件收纳管理系统</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%235b8cff'/><rect x='7' y='9' width='18' height='5' rx='1.5' fill='white'/><rect x='7' y='17' width='18' height='5' rx='1.5' fill='white' opacity='.75'/></svg>" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============================ 图标精灵 ============================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-cabinet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M3 9h18M3 15h18M9 6.2v.6M15 6.2v.6M9 12.2v.6M15 12.2v.6M9 18.2v.6M15 18.2v.6"/>
+    </symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/>
+    </symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>
+    </symbol>
+    <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7.5V12l3 2"/>
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 0 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3.1 15a2 2 0 0 1 0-4 1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.1a2 2 0 0 1 4 0 1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 20.9 11a2 2 0 0 1 0 4Z"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12M7 11l5 5 5-5M4 20h16"/>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 16V4M7 8l5-5 5 5M4 20h16"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12"/>
+    </symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9.5v5h3.5L13 19V5L7.5 9.5Z"/><path d="m17 9.5 5 5M22 9.5l-5 5"/>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/>
+    </symbol>
+    <symbol id="i-move" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8h13l-3-3M20 16H7l3 3"/>
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/>
+    </symbol>
+    <symbol id="i-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 3h11l3 3v15H5z"/><path d="M9 3v6h6V3M8 21v-6h8v6"/>
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m12 3 9 5-9 5-9-5Z"/><path d="m3 13 9 5 9-5"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.5 21.5 20H2.5Z"/><path d="M12 10v4M12 17.2v.2"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8v.2"/>
+    </symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>
+    </symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11M7 9l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M7 10l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-erase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12M4.5 16.5 15 6a2.1 2.1 0 0 1 3 3l-8 8H6l-1.5-1.5Z"/></symbol>
+    <symbol id="i-cmd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============================ 背景 ============================ -->
+<canvas id="bg-canvas"></canvas>
+<div class="bg-aura"></div>
+
+<!-- ============================ 应用 ============================ -->
+<div id="app">
+
+  <!-- 侧栏 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand" style="margin:0 6px 10px">
+      <div class="brand-mark"><svg><use href="#i-layers"/></svg></div>
+    </div>
+    <button class="nav-item on" data-nav="cabinet"><svg><use href="#i-cabinet"/></svg><span class="lbl">我的货架</span></button>
+    <button class="nav-item" data-nav="parts"><svg><use href="#i-chip"/></svg><span class="lbl">元件库</span><span class="badge" id="nav-parts-count">0</span></button>
+    <button class="nav-item" data-nav="moves"><svg><use href="#i-history"/></svg><span class="lbl">出入库流水</span></button>
+    <div class="nav-sep">系统</div>
+    <button class="nav-item" data-nav="settings"><svg><use href="#i-settings"/></svg><span class="lbl">布局与设置</span></button>
+
+    <div class="side-foot">
+      <div class="mini-card" id="side-stat">
+        <div class="row"><span>元件种类</span><b id="ss-kinds">0</b></div>
+        <div class="row"><span>在库总数</span><b id="ss-pieces">0</b></div>
+        <div class="row"><span>格子占用</span><b id="ss-cells">0 / 0</b></div>
+        <div class="bar"><i id="ss-bar" style="width:0%"></i></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <button class="icon-btn" id="btn-menu" style="display:none" title="菜单"><svg><use href="#i-grid"/></svg></button>
+    <div class="brand">
+      <div class="brand-mark"><svg><use href="#i-layers"/></svg></div>
+      <div class="brand-txt">
+        <b>PartVault</b>
+        <span id="cabinet-name">我的元件柜</span>
+      </div>
+    </div>
+
+    <div class="searchbox">
+      <span class="ico"><svg width="16" height="16"><use href="#i-search"/></svg></span>
+      <input id="global-search" type="search" placeholder="搜索元件名称 / 规格 / 封装，或输入「列A 3」定位抽屉…" autocomplete="off" />
+      <span class="kbd">Ctrl K</span>
+    </div>
+
+    <div class="topstats">
+      <span class="chip opt" title="在库元件总数"><i class="dot"></i>在库 <b id="top-pieces">0</b></span>
+      <span class="chip opt" title="占用的格子 / 总格子"><svg width="13" height="13" style="opacity:.7"><use href="#i-grid"/></svg><b id="top-cells">0/0</b></span>
+      <button class="chip clickable" id="chip-low" title="低于安全库存的元件"><i class="dot" style="background:var(--danger);box-shadow:0 0 10px var(--danger)"></i>低库存 <b id="top-low">0</b></button>
+      <button class="icon-btn" id="btn-theme" title="切换明暗主题"><svg><use href="#i-moon"/></svg></button>
+      <button class="icon-btn on" id="btn-sound" title="音效开关"><svg><use href="#i-sound"/></svg></button>
+    </div>
+  </header>
+
+  <!-- 主区 -->
+  <main class="main" id="main">
+    <section class="view on" id="view-cabinet"></section>
+    <section class="view" id="view-drawer"></section>
+    <section class="view" id="view-parts"></section>
+    <section class="view" id="view-moves"></section>
+    <section class="view" id="view-settings"></section>
+  </main>
+
+  <!-- 状态栏 -->
+  <footer class="statusbar">
+    <span id="status-msg">就绪</span>
+    <span class="sp"></span>
+    <span>数据库 <code id="status-db">—</code></span>
+  </footer>
+</div>
+
+<!-- ============================ 抽屉详情面板 ============================ -->
+<div class="sheet-mask" id="sheet-mask"></div>
+<aside class="sheet" id="sheet">
+  <div class="sheet-head">
+    <div class="t">
+      <b id="sheet-title">格子</b>
+      <span id="sheet-sub">—</span>
+    </div>
+    <button class="icon-btn" id="sheet-close"><svg><use href="#i-close"/></svg></button>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+  <div class="sheet-foot" id="sheet-foot"></div>
+</aside>
+
+<!-- ============================ 通用模态 ============================ -->
+<div class="modal-mask" id="modal-mask">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="t"><b id="modal-title">标题</b><span id="modal-sub"></span></div>
+      <button class="icon-btn" id="modal-close"><svg><use href="#i-close"/></svg></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<!-- ============================ 命令面板 ============================ -->
+<div class="cmdk" id="cmdk">
+  <div class="cmdk-box">
+    <div class="cmdk-input">
+      <svg width="18" height="18" style="color:var(--text-mute)"><use href="#i-cmd"/></svg>
+      <input id="cmdk-input" placeholder="输入命令或搜索…（放/取/新增/导出…）" autocomplete="off" />
+      <span class="kbd" style="font-size:10.5px;color:var(--text-mute);border:1px solid var(--stroke);border-radius:6px;padding:2px 6px">Esc</span>
+    </div>
+    <div class="cmdk-list" id="cmdk-list"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<input type="file" id="file-input" accept=".json" style="display:none" />
+
+<script src="js/util.js"></script>
+<script src="js/store.js"></script>
+<script src="js/components.js"></script>
+<script src="js/views/cabinet.js"></script>
+<script src="js/views/drawer.js"></script>
+<script src="js/views/parts.js"></script>
+<script src="js/views/moves.js"></script>
+<script src="js/views/settings.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

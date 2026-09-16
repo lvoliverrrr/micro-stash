@@ -1,0 +1,14 @@
+{
+  "name": "partvault",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PartVault · 电子元件收纳管理系统（微型数据库 + 实物货架可视化）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings server.js --open",
+    "serve": "node --no-warnings server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
