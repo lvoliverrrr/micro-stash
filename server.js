@@ -366,36 +366,62 @@ const SEED_PARTS = [
   ['降压模块', '电源/电池', 'LM2596 可调', '模组', '个', 5],
 ];
 
+/* ---- 种子数据：可「补齐」而不是只看是不是空表 ----
+ * 踩过的坑：首次启动如果被中途打断（用户觉得慢就关掉窗口 / 进程被 kill），
+ * 库里会留下「一半」的元件（比如只有 43 种）。原来的写法是 COUNT(*)==0 才灌，
+ * 于是这一半会被永久保留，用户还完全看不出来。
+ *
+ * 现在改成：
+ *   - 用 INSERT OR IGNORE，按 name / code 去重，缺哪条补哪条
+ *   - 灌满一次后写下 meta.seed_library=1，之后再不碰元件库
+ *     （这样用户自己删掉的元件不会被「复活」）
+ *   - 只在「从未灌满过」时才补齐，一次补齐后永久关闭该逻辑
+ */
+const SEED_FLAG = 'seed_library';
+
 function seedIfEmpty() {
-  const c = db.prepare('SELECT COUNT(*) AS n FROM categories').get().n;
-  if (c === 0) {
-    const ins = db.prepare('INSERT INTO categories(name,icon,color,sort) VALUES(?,?,?,?)');
-    SEED_CATEGORIES.forEach((row, i) => ins.run(row[0], row[1], row[2], i));
+  const done = getMeta(SEED_FLAG) === '1';
+
+  if (!done) {
+    db.exec('BEGIN');
+    try {
+      const insC = db.prepare('INSERT OR IGNORE INTO categories(name,icon,color,sort) VALUES(?,?,?,?)');
+      SEED_CATEGORIES.forEach((row, i) => insC.run(row[0], row[1], row[2], i));
+
+      const catMap = {};
+      db.prepare('SELECT id,name,color FROM categories').all().forEach((r) => (catMap[r.name] = r));
+      const insP = db.prepare(`INSERT OR IGNORE INTO parts(code,name,category_id,spec,package,unit,color,min_stock,note,created_at,updated_at)
+                               VALUES(?,?,?,?,?,?,?,?,?,?,?)`);
+      const ts = nowISO();
+      SEED_PARTS.forEach((row, i) => {
+        const cat = catMap[row[1]];
+        insP.run(
+          'PV-' + String(i + 1).padStart(4, '0'),
+          row[0],
+          cat ? cat.id : null,
+          row[2],
+          row[3],
+          row[4],
+          cat ? cat.color : '#6ea8fe',
+          row[5],
+          '',
+          ts,
+          ts
+        );
+      });
+
+      const have = db.prepare("SELECT COUNT(*) AS n FROM parts WHERE code LIKE 'PV-%'").get().n;
+      if (have >= SEED_PARTS.length) setMeta(SEED_FLAG, '1');
+      db.exec('COMMIT');
+      if (have < SEED_PARTS.length) {
+        console.log('  注意：预置元件库只补齐到 ' + have + '/' + SEED_PARTS.length + ' 种，下次启动会继续补。');
+      }
+    } catch (e) {
+      try { db.exec('ROLLBACK'); } catch (_) {}
+      throw e;
+    }
   }
-  const p = db.prepare('SELECT COUNT(*) AS n FROM parts').get().n;
-  if (p === 0) {
-    const ins = db.prepare(`INSERT INTO parts(code,name,category_id,spec,package,unit,color,min_stock,note,created_at,updated_at)
-                            VALUES(?,?,?,?,?,?,?,?,?,?,?)`);
-    const catMap = {};
-    db.prepare('SELECT id,name,color FROM categories').all().forEach((r) => (catMap[r.name] = r));
-    const ts = nowISO();
-    SEED_PARTS.forEach((row, i) => {
-      const cat = catMap[row[1]];
-      ins.run(
-        'PV-' + String(i + 1).padStart(4, '0'),
-        row[0],
-        cat ? cat.id : null,
-        row[2],
-        row[3],
-        row[4],
-        cat ? cat.color : '#6ea8fe',
-        row[5],
-        '',
-        ts,
-        ts
-      );
-    });
-  }
+
   const s = db.prepare('SELECT COUNT(*) AS n FROM stacks').get().n;
   if (s === 0) {
     // 按实照片还原：4 列抽屉组，白/黑混搭
